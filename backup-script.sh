@@ -1,32 +1,36 @@
 #!/bin/bash
-#define vars
-#time=$($date +%m-%d-%y_%H_%M_%s)
+
 time=$(date +%m-%d-%y_%H_%M_%S)
-#time=`$date +%m-%d-%y_%H_%M_%s``
-bachup_file=$1
-dest=/home/ubuntu/backup
+Backup_file=/home/ubuntu/bash
+Dest=/home/ubuntu/backup
 filename=file-backup-$time.tar.gz
 LOG_FILE="/home/ubuntu/backup/logfile.log"
 
+S3_BUCKET="s3-new-bash-course"
+FILE_TO_UPLOAD="$Dest/$filename"
 
-if [ -z "$bachup_file" ]
-then
-#if bachup_file (the user must enter the route of the file)is an empty file then you must enter the file route
-echo "Please , enter the directory you want to backup" | tee -a "$LOG_FILE"
-#tee used to save the message in log file
-exit 2
+
+if ! command -v aws &> /dev/null; then
+  echo "AWS CLI is not installed. Please install it first."
+  exit 2
 fi
-#if the last condition is false
+
 if [ $? -ne 2 ]
- then
-# $? save the exit status, if not equal 2 that mean the file isn't empty
-  if [ -f $filename]
-   then
-# -f used to check if file exits
-echo "Error $filename already exists" | tee -a "$LOG_FILE" 
+  then
+  if [ -f $filename ]
+  then
+      echo "Error file $filename already exist!" | tee -a "$LOG_FILE"
   else
-sudo tar -czvf "$dest/$filename" "$backup_file"
-# tar c: create, z: compression algorith, v: show the file compressed f: name the file
-echo "BAckup complete successfully, backup file: $dest/$filename" | tee -a "$LOG_FILE"
-   fi
+      tar -czvf "$Dest/$filename" "$Backup_file" 
+      echo "Backup completed successfully. Backup file: $Dest/$filename " | tee -a "$LOG_FILE"
+      echo
+      aws s3 cp "$FILE_TO_UPLOAD" "s3://$S3_BUCKET/"
+  fi
+fi
+
+if [ $? -eq 0 ]; then
+  echo
+  echo "File uploaded successfully to the S3 bucket: $S3_BUCKET"
+else
+  echo "File upload to S3 failed."
 fi
