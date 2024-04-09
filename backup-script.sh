@@ -1,4 +1,5 @@
 #!/bin/bash
+#define vars
 time=$($date +%m-%d-%y_%H_%M_%s)
 #time=`$date +%m-%d-%y_%H_%M_%s``
 bachup_file=$1
