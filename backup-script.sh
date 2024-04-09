@@ -25,7 +25,7 @@ if [ $? -ne 2 ]
 # -f used to check if file exits
 echo "Error $filename already exists" | tee -a "$LOG_FILE" 
   else
-tar -czvf "$dest/$filename" "$backup_file"
+sudo tar -czvf "$dest/$filename" "$backup_file"
 # tar c: create, z: compression algorith, v: show the file compressed f: name the file
 echo "BAckup complete successfully, backup file: $dest/$filename" | tee -a "$LOG_FILE"
    fi
